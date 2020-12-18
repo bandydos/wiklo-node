@@ -18,16 +18,24 @@ app.use(express.static(__dirname + '/node_modules/bootstrap/dist'));
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public/index.html')));
 
-app.get('/facts', (req, res) => {
-    res.send('helo')
+app.get('/api/facts/:term', async (req, res) => {
+    const term = req.params.term;
+    const titleUrl = `https://en.wikipedia.org/w/api.php?action=opensearch&search=${term}&format=json`;
+    const response = await fetchData(titleUrl);
+
+    const titles = response[1];
+    let searchTitle = titles[Math.floor(Math.random() * titles.length)];
+    searchTitle= searchTitle.replace(/\s+/g, '_');
+
+    const contentUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=revisions&titles=${searchTitle}&rvslots=*&rvprop=content&format=json&formatversion=2`;
+    res.json(await fetchData(contentUrl));
 })
 
-app.get('/api/facts', async (req, res) => {
-    const wiki_url = 'https://en.wikipedia.org/w/api.php?action=opensearch&format=json&search=angular';
-    const response = await fetch(wiki_url);
+const fetchData = async (url) => {
+    const response = await fetch(url);
     if (!response.ok) {
         console.log(`Something went wrong, status: ${response.status}.`);
         return;
     }
-    res.json(await response.json());
-});
+    return await response.json();
+}
