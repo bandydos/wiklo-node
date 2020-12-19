@@ -31,15 +31,15 @@ app.get('/api/facts/:term', async (req, res) => {
     const content = await fetchData(contentUrl);
 
     const page = content.query.pages[0];
-    
+
     const pageid = page.pageid;
     const pagetitle = page.title;
     const pagecontent = page.revisions[0].slots.main.content;
 
     const usable = {
-        'pId': pageid,
-        'pContent': pagecontent,
-        'pTitle': pagetitle,
+        'pageId': pageid,
+        'pageContent': pagecontent,
+        'pageTitle': pagetitle,
     }
 
     res.json(usable);
