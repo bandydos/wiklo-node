@@ -27,10 +27,11 @@ app.get('/api/facts/:term', async (req, res) => {
     let searchTitle = titles[Math.floor(Math.random() * titles.length)];
     searchTitle = searchTitle.replace(/\s+/g, '_');
 
+    console.log(searchTitle);
     const contentUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=revisions&titles=${searchTitle}&rvslots=*&rvprop=content&format=json&formatversion=2`;
-    const content = await fetchData(contentUrl);
+    const content = await fetchData(encodeURI(contentUrl));
 
-    const page = content.query.pages[0];
+    const page = content.query.pages[0]; 
 
     const pageid = page.pageid;
     const pagetitle = page.title;

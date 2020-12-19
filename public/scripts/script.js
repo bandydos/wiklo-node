@@ -1,30 +1,41 @@
 $(async () => {
     // Tags.
+    const pWarning = $('#p-warning');
     const hTitle = $('#h-title');
     const hId = $('#h-id');
     const pContent = $('#p-content');
+    const divArticle = $('#div-article');
 
-    // Display loading screen.
-    displayWhileFetching();
-    // Fetch initial data.
+    pWarning.hide();
+
+    // Initial fetch.
+    hTitle.text('Fetching...');
     const initialData = await getData('http://localhost:3001/api/facts/api');
-    // Fill in data.
-    fillIn(hTitle, hId, pContent, initialData);
+    fillIn(hTitle, hId, pContent, initialData); // Fill in data.
+    divArticle.addClass('border'); // Add border.
 
+    // Button click.
     $('#btn-search').on('click', async () => {
-        emptyOut([hId, pContent]);
-        displayWhileFetching();
+        divArticle.removeClass('border'); // Remove border.
+        emptyOut([hId, pContent]); // Empty out id and content.
 
+        // If no input.
         if (!$('#input-search').val()) {
+            // Warn.
             $('#p-warning').show();
             $('#p-warning').text('please fill in search form.').css('color', 'red');
-            emptyOut([hTitle]);
+            emptyOut([hTitle]); // Empty out title as well.
             return;
         }
 
-        const data = await getData(`http://localhost:3001/api/facts/${$('#input-search').val()}`);
-        fillIn(hTitle, hId, pContent, data);
-        console.log(data);
+        pWarning.hide();
+
+        // Fetch data for searching term.
+        hTitle.text('Fetching...');
+        const searchData = await getData(`http://localhost:3001/api/facts/${$('#input-search').val()}`);
+        fillIn(hTitle, hId, pContent, searchData); // Fill in data.
+        divArticle.addClass('border');
+        console.log(searchData);
     })
 })
 
@@ -47,7 +58,7 @@ const emptyOut = (tags) => {
 
 const fillIn = (titleTag, idTag, contentTag, data) => {
     titleTag.text(data.pageTitle);
-    idTag.text(data.pageId);
+    idTag.text(`(id: ${data.pageId})`);
     contentTag.text(data.pageContent);
 }
 
